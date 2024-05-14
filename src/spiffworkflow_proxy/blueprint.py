@@ -10,6 +10,7 @@ from flask import redirect
 from flask import request
 from flask import session
 from flask import url_for
+from flask import copy_current_request_context
 from flask_oauthlib.contrib.client import OAuth  # type: ignore
 from spiffworkflow_connector_command.command_interface import ConnectorProxyResponseDict
 
@@ -41,7 +42,9 @@ def list_commands() -> Response:
 
 @proxy_blueprint.route("/v1/do/<plugin_display_name>/<command_name>", methods=["GET", "POST"])
 def do_command(plugin_display_name: str, command_name: str) -> Response:
-    command = PluginService.command_named(plugin_display_name, command_name)
+    command = copy_current_request_context(
+        PluginService.command_named(plugin_display_name, command_name)
+    )
     if command is None:
         return json_error_response(
             message="It either does not exist or does not inherit from spiffworkflow_connector_command.",
