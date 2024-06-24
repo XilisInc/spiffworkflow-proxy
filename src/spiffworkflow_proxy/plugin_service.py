@@ -82,7 +82,7 @@ class PluginService:
         plugin: types.ModuleType, package_name: str | None
     ) -> Generator[tuple[str, types.ModuleType], None, None]:
         for finder, name, ispkg in pkgutil.iter_modules(plugin.__path__):
-            if ispkg and name == package_name:
+            if ispkg and (name == package_name or package_name is None):
                 found_module = finder.find_module(name)  # type: ignore
                 if found_module is not None:
                     sub_pkg = found_module.load_module(name)
